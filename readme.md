@@ -14,11 +14,17 @@ Installer [mkcert](https://github.com/FiloSottile/mkcert) :
 - Windows : utiliser le package manager "**[Choco](https://chocolatey.org/install#individual-method)**"
 - Sur Linux (ou WSL2) : utiliser le package manager "**[Brew](https://brew.sh)**"
 
+Installer make pour les commandes makefile :
+```bash
+sudo apt update
+sudo apt install make
+```
+
 ### Certificats
 
 Dans le dossier `./certs` il faudra générer le certificat pour autoriser les noms de domaine en SSL (https) en local :
 
-```
+```bash
 mkcert --install
 ```
 
@@ -31,7 +37,7 @@ Chemin du certificat root (clé privée et clé publique)
 
 #### Générer le certificat pour les projets : 
 
-```
+```bash
 mkcert -cert-file localhost.cert -key-file localhost.key "localhost" "traefik.localhost" "phpmyadmin.localhost" "vetementpro.localhost" "gds.localhost"
 ```
 
