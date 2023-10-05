@@ -1,0 +1,41 @@
+version: "3.3"
+
+services:
+
+  db:
+    image: library/mariadb:11.1
+    container_name: mariadb
+    ports:
+      - 33057:3306
+    volumes:
+      - /var/www/html/dbtest:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: hello
+    restart: always
+    networks:
+      - traefik_reverse_proxy
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    volumes:
+      - ./config/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_USER=root
+      - PMA_PASSWORD=hello
+      - UPLOAD_LIMIT=128M
+    labels:
+      - traefik.http.routers.phpmyadmin.middlewares=tls-redirectscheme@docker
+      - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.localhost`)
+      - traefik.http.routers.phpmyadmin.entrypoints=http
+      - traefik.http.routers.phpmyadmin-secure.rule=Host(`phpmyadmin.localhost`)
+      - traefik.http.routers.phpmyadmin-secure.tls=true
+      - traefik.http.routers.phpmyadmin-secure.entrypoints=https
+    networks:
+      - traefik_reverse_proxy
+
+networks:
+  traefik_reverse_proxy:
+    external: true

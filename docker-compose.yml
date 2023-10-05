@@ -1,0 +1,60 @@
+version: "3.9"
+
+services:
+
+  traefik:
+    image: traefik
+    container_name: traefik
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - .docker/traefik:/etc/traefik:ro
+      - ./certs:/certs:ro
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    labels:
+      - traefik.http.routers.traefik_test.rule=Host(`traefik.localhost`)
+      - traefik.http.services.traefik_test.loadbalancer.server.port=8080
+      - traefik.http.middlewares.tls-redirectscheme.redirectscheme.scheme=https
+      - traefik.http.middlewares.tls-redirectscheme.redirectscheme.permanent=true
+      - traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH}
+      - traefik.http.middlewares.traefik-auth.basicauth.removeheader=true
+      - traefik.http.routers.traefik-ui.middlewares=traefik-auth
+      - traefik.http.routers.traefik_test.middlewares=tls-redirectscheme@docker
+      - traefik.http.routers.traefik_test-secure.rule=Host(`traefik.localhost`)
+      - traefik.http.routers.traefik_test-secure.tls=true
+      - traefik.http.routers.traefik_test-secure.entrypoints=https
+    networks:
+      - reverse_proxy
+
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`portainer.localhost`)
+      - traefik.http.routers.portainer.entrypoints=http
+    networks:
+      - reverse_proxy
+
+volumes:
+  portainer_data:
+
+networks:
+  reverse_proxy:
+    driver: bridge
+
