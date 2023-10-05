@@ -5,10 +5,10 @@ Allows custom local subdomains in the same port (::80) and with local ssl certif
 
 ## Installation
 
-Installer au préalable docker & docker-compose
+Installer au préalable docker desktop si vous êtes sur Windows 
 
 Sur windows :
-- Installer WSL2 + docker & docker-compose
+- Installer WSL2, une distro Ubuntu (20 ou 22) et autoriser l'intégration de docker desktop dans le distro utilisée (Ubuntu XX.XX) dans Paramètres > Resources > WSL 2 integrations
 
 Installer [mkcert](https://github.com/FiloSottile/mkcert) :
 - Windows : utiliser le package manager "**[Choco](https://chocolatey.org/install#individual-method)**"
